@@ -58,7 +58,14 @@ def install():
             if not (Path(tmp) / name / "SKILL.md").is_file():
                 raise ValueError("安装包缺少技能说明。")
         for name in missing:
-            (Path(tmp) / name).rename(root / name)
+            for attempt in range(8):
+                try:
+                    (Path(tmp) / name).rename(root / name)
+                    break
+                except PermissionError:
+                    if attempt == 7:
+                        raise
+                    time.sleep(0.15 * (attempt + 1))
             print("已安装", name)
     print("请重启 Codex 加载技能。")
 
